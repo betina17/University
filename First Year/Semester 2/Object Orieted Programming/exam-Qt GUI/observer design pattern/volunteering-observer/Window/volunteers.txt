@@ -1,0 +1,3 @@
+maria|maria@gmail.com|pictura,dans|prim-ajutor
+flavia|flavia@yahoo.com|tenis, volei|gradinita
+roberta|roberta@gmail.com|canto,pian|unassigned

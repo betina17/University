@@ -1,0 +1,84 @@
+Class: Graph
+Description
+The Graph class represents a directed, weighted graph. It provides methods to create, read, write, modify and manage vertices and edges within the graph.
+
+Attributes
+__predecessors_dict: A dictionary with vertices as keys and their predecessors as values.
+__successors_dict: A dictionary with vertices as keys and their successors as values.
+__cost_of_edges_dict: A dictionary with tuples representing edges (vertex_out, vertex_in) as keys and their costs as values.
+__set_of_vertices: A list containing all vertices of the graph.
+__list_of_copies: A list containing all the copies of the current graph.
+__nr_of_vertices: An integer representing the number of vertices in the graph.
+__nr_of_edges: An integer representing the number of edges in the graph.
+Methods
+create_successors_dict_with_vertices_as_keys_and_empty_lists_as_values(self, nr_of_vertices)
+This method initializes the __successors_dict with vertices as keys and empty lists as values.
+
+create_predecessors_dict_with_vertices_as_keys_and_empty_lists_as_values(self, nr_of_vertices)
+This method initializes the __predecessors_dict with vertices as keys and empty lists as values.
+
+create_data_dictionaries(self, vertex_out, vertex_in, cost_edge)
+This method updates the dictionaries __successors_dict, __predecessors_dict, and __cost_of_edges_dict with the provided edge information.
+
+create_the_set_of_vertices(self)
+This method populates the __set_of_vertices with all unique vertices in the graph.
+
+read_file(self, file_name_read)
+This method reads the graph data from a file and initializes the graph attributes accordingly.
+
+write_file(self, file_name_write)
+This method writes the current graph data to a file.
+
+verify_if_vertex(self, vertex)
+This method checks if a vertex exists in the graph.
+
+get_nr_of_vertices(self)
+This method returns the number of vertices in the graph.
+
+get_nr_of_edges(self)
+This method returns the number of edges in the graph.
+
+parse_successors_of_a_vertex(self, vertex)
+This method returns a generator that iterates through the successors of a given vertex.
+
+parse_predecessors_of_a_vertex(self, vertex)
+This method returns a generator that iterates through the predecessors of a given vertex.
+
+parse_set_of_vertices(self)
+This method returns a generator that iterates through the set of vertices in the graph.
+
+add_vertex(self, new_vertex, file_name_write)
+This method adds a new vertex to the graph, updates the predecessors and successors dictionaries, and writes the updated graph to the specified file.
+
+remove_vertex(self, vertex_to_remove, file_name_write)
+This method removes a vertex from the graph, updates the predecessors and successors dictionaries, removes the corresponding edges, and writes the updated graph to the specified file.
+
+verify_if_edge(self, vertex_out, vertex_in)
+This method checks if a given edge, specified by its two vertices, exists in the graph.
+
+modify_cost_of_edge(self, vertex_out, vertex_in, new_cost, file_name_write)
+This method modifies the cost of an existing edge and writes the updated graph to the specified file.
+
+get_cost_of_edge(self, vertex_out, vertex_in)
+This method returns the cost of an edge specified by its two vertices.
+
+add_edge(self, vertex_out, vertex_in, cost_of_edge, file_name_write)
+This method adds an edge to the graph, updates the corresponding dictionaries, and writes the updated graph to the specified file.
+
+remove_edge(self, vertex_out, vertex_in, file_name_write)
+This method removes an edge from the graph, updates the corresponding dictionaries, and writes the updated graph to the specified file.
+
+copy(self)
+This method creates a deep copy of the graph and appends it to the list of copies.
+
+get_nr_of_copies(self)
+This method returns the number of copies stored in the list of copies.
+
+get_copy(self, index)
+This method returns a copy of the graph from the list of copies, specified by its index.
+
+delete_copy(self, index)
+This method deletes a copy of the graph from the list of copies, specified by its index.
+
+generate_random_graph(self, nr_of_vertices, nr_of_edges, file_name_write)
+This method generates a random graph with a specified number of vertices and edges, and writes it to the specified file.

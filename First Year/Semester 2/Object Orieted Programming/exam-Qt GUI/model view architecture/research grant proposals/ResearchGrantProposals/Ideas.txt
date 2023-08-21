@@ -1,0 +1,4 @@
+X|the everything app|accepted|Herman Teodora|3|
+Neuralink|implantable brain computer|proposed|Timoce Darius Kevin|3|
+App|Simple app|accepted|Sustrean Roberta|2|
+cancer-cure|mura|proposed|Herman Teodora|3|

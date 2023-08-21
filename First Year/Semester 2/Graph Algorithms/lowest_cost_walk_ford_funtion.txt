@@ -1,0 +1,47 @@
+    def find_lowest_cost_walk(self,start_vertex, end_vertex):
+        inf = 99999
+        distance = [inf] * self.__nr_of_vertices #initializez distantele cu infinit, asta inseamna ca inca nu am gasit niciun path pana la acel nod
+                                                #de la start_vertex inca
+        distance[start_vertex] = 0
+        predecessor = [-1] * self.__nr_of_vertices
+        for i in range(0, self.__nr_of_vertices-1): #parcurg de nr_of_vertices-1 ori, pt ca la ultima iteratie nu mai am ce actualiza
+            updated = False
+            for edge in self.__cost_of_edges_dict: #edge o sa fie fiecare cheie din dictionar
+                edge_start=edge[0]
+                edge_end=edge[1]
+                if edge_end != start_vertex: #aici as avea o muchie care se termina in start vertex, si nu ma intereseaza distanta pana la ea
+                    if distance[edge_start] + self.__cost_of_edges_dict[edge] < distance[edge_end]:
+                        updated = True
+                        predecessor[edge_end] = edge_start
+                        distance[edge_end] = distance[edge_start] + self.__cost_of_edges_dict[edge]
+                        #daca distanta "noua" e mai mica decat cea veche, atunci o actualizez
+
+            if updated == False:
+                        break
+
+        if distance[end_vertex] == inf: #daca distanta a ramas tot inf, inseamna ca nu am gasit nicio cale de la nodul de start pana la cel de final
+                                        #pentru ca distanta nu s-a modificat deloc
+            return "There is no path between these two vertices"
+
+        #daca avem path, il construim
+        path = []
+        current_vertex = end_vertex
+        while predecessor[current_vertex] != -1:
+            path.append(current_vertex)
+            current_vertex = predecessor[current_vertex]
+        path.append(current_vertex)
+        path.reverse()
+
+        #verificam daca path-ul este un ciclu de cost negativ, daca nu, il afisam
+        #e ciclu negativ daca putem mai relaxa cel putin un nod din acel path- ca inseamna ca acel nod se poate relaxa la infinit, adica costul
+        #de la start la acel nod poate fi infinit, deci e ciclu negativ, si tot path-ul e ciclu negativ
+
+        for edge in self.__cost_of_edges_dict:
+            edge_start = edge[0]
+            edge_end = edge[1]
+            if edge_end != start_vertex: #din nou, nici aici nu ma intereseaza costul nodului de start
+                if distance[edge_start] + self.__cost_of_edges_dict[edge] < distance[edge_end]:
+                    if edge_end in path: #daca nodul care se poate relaxa la infinit se afla in path, atunci path-ul e ciclu negativ
+                        return "The lowest cost path between these two vertices is a negtive cycle"
+
+        return f"The lowest cost path between {start_vertex} and {end_vertex} is {distance[end_vertex]}  and the path is {path}"

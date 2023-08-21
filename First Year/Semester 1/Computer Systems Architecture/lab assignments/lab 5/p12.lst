@@ -1,0 +1,50 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit               ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                  
+    11                                  ; our data is declared here (the variables needed by our program)
+    12                                  segment data use32 class=data
+    13                                      ; ...
+    14 00000000 616263646566                s1 db "abcdef"
+    15                                      l1 equ $-s1 
+    16 00000006 3132333435                  s2 db "12345"
+    17                                      l2 equ $-s2 
+    18 0000000B 00<rept>                    d times (l1 + l2 +1) // 2 db 0 
+    19                                  
+    20                                  ; our code starts here
+    21                                  segment code use32 class=code
+    22                                      start:
+    23                                          ; Two character strings S1 and S2 are given. Obtain the string D by concatenating the elements found on even positions in S2 and the elements found on odd positions in S1.
+    24 00000000 B903000000                      mov ecx, (l2+1)//2
+    25 00000005 BB00000000                      mov ebx, 0
+    26 0000000A BA00000000                      mov edx, 0
+    27                                          Repeat1:
+    28 0000000F 8A83[06000000]                      mov al, [s2+ebx]
+    29 00000015 8882[0B000000]                      mov [d+edx], al
+    30 0000001B 43                                  inc ebx
+    31 0000001C 43                                  inc ebx
+    32 0000001D 42                                  inc edx
+    33 0000001E E2EF                            loop Repeat1
+    34                                          
+    35 00000020 B903000000                      mov ecx, (l1+1)//2
+    36 00000025 BB01000000                      mov ebx, 1
+    37                                          
+    38                                          Repeat2:
+    39 0000002A 8A83[00000000]                      mov al, [s1+ebx]
+    40 00000030 8882[0B000000]                      mov [d+edx], al
+    41 00000036 43                                  inc ebx
+    42 00000037 43                                  inc ebx
+    43 00000038 42                                  inc edx
+    44 00000039 E2EF                            loop Repeat2   
+    45                                              
+    46                                          
+    47                                      
+    48                                          ; exit(0)
+    49 0000003B 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    50 0000003D FF15[00000000]                  call    [exit]       ; call exit to terminate the program

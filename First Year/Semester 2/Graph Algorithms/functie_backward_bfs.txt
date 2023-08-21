@@ -1,0 +1,49 @@
+    def find_shortest_path_between_2_vertex_backward_bfs(self, start_vertex, target_vertex):
+        #pt ca e backward, plec de la target_vertex pana la start, si atunci parcurg bfs-ul doar pe predecesorii fiecarui nod
+        visited = []
+        successors = {}
+        queue = Queue()
+        path_found = 0
+        #iau asta pt ca poate nu e o cale pana la acel nod de la nodul de start, mai ales ca e orientat, dar si pt ca poate e izolat
+
+        successors[target_vertex] = None
+        #nu ne intereseaza succesorii targetului, pt ca de la el plecam si mergem pe predecesori, adica o sa mergem inapoi de la target la start, si asta inseamna
+        #ca parcurgem succesorii de la start la target(doar ca in cazul backward, invers) si acolo ne oprim, adica succesorii targetului nu ne intereseaza
+        #deci spunem ca successors[target_vertex] = None
+        queue.put(target_vertex)
+        visited.append(target_vertex)
+
+
+        start_reached = False
+        while queue.empty() == False and start_reached == False:
+            current_node = queue.get()
+            if current_node == start_vertex: #daca gasim nodul de start, oprim iteratia, am gasit path-ul
+                path_found = 1
+                break
+            else:
+                for predecessor in self.__predecessors_dict[current_node]: #parcurgem dictionarul de predecesori al fiecarui nod curent-backward
+                    if predecessor not in visited:
+                        successors[predecessor] = current_node
+                        if predecessor == start_vertex: #daca gasim nodul de start, oprim iteratia, am gasit path-ul
+                            path_found = 1
+                            start_reached = True
+                            break
+                        else:
+                            visited.append(predecessor)
+                            queue.put(predecessor)
+
+        if path_found == 1: #reconstruim path-ul plecand de la nodul de inceput, mergand pe succesorul fiecarui nod, pana la nodul target
+            path = []
+            node_in_path = start_vertex
+            path.append(node_in_path)
+            while successors[node_in_path] != None:
+                if node_in_path == target_vertex:
+                    path.append(target_vertex)
+                else:
+                    node_in_path = successors[node_in_path]
+                    path.append(node_in_path)
+
+            return path
+
+        else:
+            return "The path between these vertices doesn't exist"

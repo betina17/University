@@ -1,0 +1,3 @@
+x|bla|5|cancer, lung problems|
+y|blc|6|gut problems, headaches|
+z|blb|7|headaches, fatigue|

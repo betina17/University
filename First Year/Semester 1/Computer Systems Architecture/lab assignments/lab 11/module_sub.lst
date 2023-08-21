@@ -1,0 +1,41 @@
+     1                                  bits 32
+     2                                  global Concatenation
+     3                                  extern stringconcat
+     4                                  
+     5                                  segment code use32 class=code
+     6                                      Concatenation:
+     7 00000000 BF[00000000]                    mov edi, stringconcat ;destiantion = stringconcat1
+     8 00000005 89C6                            mov esi, eax ;source=string1, pe care l am pus in eax in celalalt modul
+     9                                          ;mov edx, 0
+    10 00000007 B900000000                      mov ecx, 0
+    11                                      .stringconcatLoop:
+    12 0000000C AC                              lodsb ;pune fiecare byte din esi 
+    13 0000000D 84C0                            test al, al
+    14 0000000F 7410                            jz .gata
+    15 00000011 AA                              stosb ;pune byte ul din al in edi, si edi  incepe de pe poz 0, deci o sa am elem din string1 pe poz pare
+    16 00000012 56                              push esi
+    17 00000013 01CB                            add ebx, ecx
+    18 00000015 89DE                            mov esi, ebx
+    19 00000017 AC                              lodsb
+    20 00000018 41                              inc ecx
+    21 00000019 84C0                            test al, al
+    22 0000001B 7404                            jz .gata
+    23 0000001D AA                              stosb
+    24 0000001E 5E                              pop esi
+    25                                          ;mov cl, [ebx]
+    26                                          ;test cl,cl
+    27                                          ;jz .gata
+    28                                          ;mov edi, byte [ebx]
+    29                                          ;inc ebx
+    30                                          ;inc edi
+    31 0000001F EBEB                            jmp .stringconcatLoop
+    32                                      .gata:
+    33 00000021 AA                              stosb
+    34                                          mov stringconcat, edi
+    34          ******************       error: invalid combination of opcode and operands
+    35 00000022 C3                              ret
+    36                                     
+    37                                          
+    38                                          
+    39                                          
+    40                                          

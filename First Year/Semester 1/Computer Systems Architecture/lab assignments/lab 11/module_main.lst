@@ -1,0 +1,39 @@
+     1                                  bits 32 
+     2                                  global stringconcat
+     3                                  extern Concatenation
+     4                                  
+     5                                  extern exit, printf
+     6                                  import exit msvcrt.dll    
+     7                                  import printf msvcrt.dll       
+     8                                  global start                  
+     9                                  
+    10                                  segment data use32 class=data
+    11                                      
+    12 00000000 48656C6C6F206C6974-         string1 db 'Hello little angel',0
+    12 00000009 746C6520616E67656C-
+    12 00000012 00                 
+    13 00000013 486F6E657920746173-         string2 db 'Honey tastes great', 0
+    13 0000001C 746573206772656174-
+    13 00000025 00                 
+    14 00000026 <res 000003E8>              stringconcat resb 1000
+    15 0000040E 257300                      format db '%s', 0
+    16                                  
+    17                                  segment code use32 class=code
+    18                                      start:
+    19 00000000 B8[00000000]                    mov eax, string1
+    20 00000005 BB[13000000]                    mov ebx, string2
+    21 0000000A E8(00000000)                    call Concatenation
+    22 0000000F 68[26000000]                    push dword stringconcat
+    23 00000014 68[0E040000]                    push format
+    24 00000019 FF15[00000000]                  call[printf]
+    25 0000001F 83C408                          add esp, 2*4
+    26 00000022 B8[13000000]                    mov eax, string2
+    27 00000027 BB[00000000]                    mov ebx, string1
+    28 0000002C E8(00000000)                    call Concatenation
+    29 00000031 68[26000000]                    push dword stringconcat
+    30 00000036 68[0E040000]                    push format
+    31 0000003B FF15[00000000]                  call[printf]
+    32 00000041 83C408                          add esp, 2*4
+    33 00000044 6A00                            push    dword 0      
+    34 00000046 FF15[00000000]                  call    [exit]       
+    35                                          

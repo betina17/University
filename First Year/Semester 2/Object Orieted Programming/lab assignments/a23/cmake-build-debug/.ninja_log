@@ -1,0 +1,7 @@
+# ninja log v5
+1	275	7018825687995355	CMakeFiles/a2_clion_well.dir/main.c.obj	e4e3601a77877cd5
+38	307	7018825688305379	CMakeFiles/a2_clion_well.dir/Ui.c.obj	850c7cbcf057fa3
+16	336	7018825688615360	CMakeFiles/a2_clion_well.dir/Domain.c.obj	a7b59ca14a2cf586
+53	349	7018825688775371	CMakeFiles/a2_clion_well.dir/Services.c.obj	287fdd7429b37429
+27	366	7018825688905330	CMakeFiles/a2_clion_well.dir/Repository.c.obj	940e852eb0c8d5aa
+367	664	7018825691561319	a2_clion_well.exe	a69a894917e6dc8b

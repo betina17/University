@@ -1,0 +1,65 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit, fopen, fprintf, fclose, scanf             ; tell nasm that exit exists even if we won't be defining it
+     8                                  import fopen msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                  import fprintf msvcrt.dll       ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                  import fclose msvcrt.dll 
+    11                                  import scanf msvcrt.dll
+    12                                  import exit msvcrt.dll 
+    13                                  ; our data is declared here (the variables needed by our program)
+    14                                  segment data use32 class=data
+    15                                      ; ...
+    16 00000000 46696C654F70656E2E-         file_name db "FileOpen.txt",0
+    16 00000009 74787400           
+    17 0000000D 00000000                    a dd 0
+    18 00000011 256300                      format db "%c", 0 ;citesc ca si caracter pt ca asa si pun in fisiwer, ca si string
+    19 00000014 7700                        access_mode db "w", 0 ;si de asta
+    20 00000016 FFFFFFFF                    file_descriptor dd -1  ;ai nevoie de chestia asta 
+    21 0000001A 2563                        printf_format db "%c" ;printez ca si text
+    22                                      ;text times 100 db 0
+    23                                      
+    24                                  ; our code starts here
+    25                                  segment code use32 class=code
+    26                                      start:
+    27                                          ; A file name is given (defined in the data segment). Create a file with the given name, then read numbers from the keyboard and write those numbers in the file, until the value '0' is read from the keyboard
+    28 00000000 68[14000000]                    push dword access_mode     
+    29 00000005 68[00000000]                    push dword file_name
+    30 0000000A FF15[00000000]                  call [fopen]
+    31 00000010 83C408                          add esp, 4*2 
+    32 00000013 A3[16000000]                    mov [file_descriptor], eax ; store the file descriptor returned by fopen
+    33 00000018 83F800                          cmp eax, 0
+    34 0000001B 7447                            je final ; check if fopen() has successfully created the file (EAX != 0)
+    35                                          numbers:
+    36 0000001D 68[0D000000]                        push a
+    37 00000022 68[11000000]                        push format
+    38 00000027 FF15[00000000]                      call [scanf]
+    39 0000002D 83C408                              add esp, 4*2
+    40 00000030 833D[0D000000]30                    cmp dword [a], '0' ;vrea sa vada daca numarul introdus e 0, l am scris '0' si nu 0 pt ca eu introduc caractere, string-uri
+    41                                                                  ;ca am pus format db "%c", 0, c de la character
+    42                                              
+    43 00000037 741C                                je zero
+    44                                              
+    45 00000039 FF35[0D000000]                      push dword [a]
+    46 0000003F 68[1A000000]                        push printf_format
+    47 00000044 FF35[16000000]                      push dword [file_descriptor]
+    48 0000004A FF15[00000000]                      call [fprintf]
+    49 00000050 83C40C                              add esp, 4*3
+    50                                              
+    51 00000053 EBC8                            jmp numbers ;asta face loop ul sa fie infinit, pt ca eu nu stiu de cate ori sa execut loop-ul, ca trebe executat de atatea ori
+    52                                                       ;cate numere vrea utilizatorul sa introduca, asa ca nu am ce val sa ii dau lui ecx, si jmp eticheta ma ajuta
+    53                                                       ;sa efectuez loop ul cat timp nu ies din el. ies in momentul in care imi intra in je zero, ca iese din numbers
+    54                                                       ;si se duce la zero: si nu se mai intoarce, si e perf
+    55                                          zero:
+    56 00000055 FF35[16000000]                      push dword [file_descriptor]
+    57 0000005B FF15[00000000]                      call [fclose]
+    58 00000061 83C404                              add esp, 4
+    59                                          final:
+    60                                              
+    61                                      
+    62                                          ; exit(0)
+    63 00000064 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    64 00000066 FF15[00000000]                  call    [exit]       ; call exit to terminate the program

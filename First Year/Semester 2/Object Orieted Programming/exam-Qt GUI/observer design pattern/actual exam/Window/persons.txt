@@ -1,0 +1,4 @@
+ionela|2,4|0|
+maria|5,6|1|
+ioana|8,9|1|
+miriam|4,5|0|

@@ -1,0 +1,61 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit               ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                  
+    11                                  ; our data is declared here (the variables needed by our program)
+    12                                  segment data use32 class=data
+    13                                      ; ...
+    14 00000000 0A                              a db 10
+    15 00000001 1400                            b dw 20
+    16 00000003 1E000000                        c dd 30
+    17 00000007 2800000000000000                d dq 40
+    18                                  ; our code starts here
+    19                                  segment code use32 class=code
+    20                                      start:
+    21                                          ; (a+b+d)-(a-c+d)+(b-c) unsigned
+    22 00000000 A0[00000000]                    mov al, [a]
+    23 00000005 B400                            mov ah, 0 ;ax=a fac a word
+    24 00000007 668B1D[01000000]                mov bx, [b] 
+    25 0000000E 6601D8                          add ax, bx ;ax=a+b 
+    26 00000011 6650                            push ax
+    27 00000013 B800000000                      mov eax, 0
+    28 00000018 6658                            pop ax ;eax=a+b am facut a+b dd
+    29 0000001A BA00000000                      mov edx, 0
+    30 0000001F 0305[07000000]                  add eax, [d]
+    31 00000025 1315[0B000000]                  adc edx, [d+4] ; in eax si edx am a+b+d dq; eax e 70, adica 46 in baza 16, iar edx e 0, adica restu
+    32 0000002B 8A1D[00000000]                  mov bl, [a]
+    33 00000031 B700                            mov bh, 0 ;bx=a am fc a word
+    34 00000033 6653                            push bx
+    35 00000035 BB00000000                      mov ebx, 0
+    36 0000003A 665B                            pop bx ;ebx=a am fc a dd, ca si c
+    37 0000003C 8B0D[03000000]                  mov ecx, [c]
+    38 00000042 29CB                            sub ebx, ecx ;ebx=a-c, ecx e liber, ebx e dd, adica -20
+    39 00000044 B900000000                      mov ecx, 0
+    40 00000049 031D[07000000]                  add ebx, [d]
+    41 0000004F 130D[0B000000]                  adc ecx, [d+4] ;in ebx-lower part cu dd=a-c si primii 4 bytes din d si ecx-higher part cu ultimii 4 bytes din d
+    42                                          ;in ebx si ecx am dq a-c+d; rez e 20, adica ebx e 14, care e 20 in baza 16, si ecx e 1, adidca am rest 1
+    43 00000055 29D8                            sub eax, ebx ;scad din lower part de la a+b+d lower partu de la a-c+d
+    44 00000057 19CA                            sbb edx, ecx ;scad din higher part de la a+b+d higher partu de la a-c+d
+    45                                          ;in edx:eax am (a+b+d)-(a-c+d)
+    46 00000059 668B1D[01000000]                mov bx, [b]
+    47 00000060 6653                            push bx
+    48 00000062 BB00000000                      mov ebx, 0
+    49 00000067 665B                            pop bx ;ebx=b dd
+    50 00000069 2B1D[03000000]                  sub ebx,  [c] ;ebx=b-c
+    51 0000006F 01D8                            add eax, ebx
+    52 00000071 83D200                          adc edx, 0
+    53                                          
+    54                                          
+    55                                          
+    56                                          
+    57                                          
+    58                                          
+    59                                          ; exit(0)
+    60 00000074 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    61 00000076 FF15[00000000]                  call    [exit]       ; call exit to terminate the program

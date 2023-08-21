@@ -1,0 +1,11 @@
+s,red,100,10,https://www.farfetch.com/ro/shopping/women/dolce-gabbana-belted-trench-coat-item-17566049.aspx
+m,blue,110,12,https://answear.ro/p/lauren-ralph-lauren-trenci-femei-culoarea-albastru-marin-de-tranzitie-cu-doua-randuri-de-nasturi-764035
+m,green,120,8,https://www.fashiondays.ro/p/trenci-din-amestec-de-lyocell-cu-detalii-funda-martna-femei-ted-baker-p5349737-1/
+l,black,130,6,https://www.zalando.ro/mango-trenci-black-m9121u19y-q11.html
+s,brown,140,15,https://www2.hm.com/ro_ro/productpage.1115457004.html
+m,gray,150,5,https://www.farfetch.com/ro/shopping/women/anine-bing-finley-water-repellent-double-breasted-trench-coat-item-19672603.aspx
+s,white,160,9,https://ro.maxmara.com/p-9021053706002-atrench-ecru
+m,yellow,170,7,https://ro.maxmara.com/p-5021023706017-lembi-yellow
+l,pink,180,4,https://modivo.ro/p/boss-trench-cacargo-50472139-violet-regular-fit
+l,purple,190,11,https://www.cettire.com/ro/products/msgm-belted-waist-double-breasted-coat-919558525/cmVhY3Rpb24vcHJvZHVjdDpaYjd2NzZiaTd4dmpxaTMzZA%3D%3D
+s,black,45,100,https://hawkbull.de/premium-ww2-trench-coat-mens/

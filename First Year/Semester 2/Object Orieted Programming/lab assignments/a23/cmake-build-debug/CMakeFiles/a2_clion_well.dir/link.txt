@@ -1,0 +1,3 @@
+"D:\apps\Clion\CLion 2022.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\a2_clion_well.dir/objects.a
+"D:\apps\Clion\CLion 2022.3\bin\mingw\bin\ar.exe" qc CMakeFiles\a2_clion_well.dir/objects.a @CMakeFiles\a2_clion_well.dir\objects1.rsp
+"D:\apps\Clion\CLion 2022.3\bin\mingw\bin\gcc.exe" -g -Wl,--whole-archive CMakeFiles\a2_clion_well.dir/objects.a -Wl,--no-whole-archive -o a2_clion_well.exe -Wl,--out-implib,liba2_clion_well.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\a2_clion_well.dir\linklibs.rsp
