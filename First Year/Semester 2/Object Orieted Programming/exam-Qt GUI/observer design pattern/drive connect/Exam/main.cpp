@@ -6,7 +6,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Services services; 
     Session session(services.get_reports_repo().get_reports());
-    for (Driver driver : services.get_drivers_repo().get_drivers())
+    std::vector<Driver>& drivers = services.get_drivers_repo().get_drivers();
+    for (Driver& driver : drivers)
     {
         Window* window = new Window(services, session, driver);
         window->show();

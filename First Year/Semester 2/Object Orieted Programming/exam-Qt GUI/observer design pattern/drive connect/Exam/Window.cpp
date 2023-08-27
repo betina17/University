@@ -61,12 +61,14 @@ void Window::update()
 }
 void Window::add_report()
 {
+   
     std::string report_description = ui.report_description_line->text().toStdString(); //folosim asta pt ca text() method
     //returneaza un QString, da noua ne trebe string normal
     int report_latitude = stoi(ui.report_latitude_line->text().toStdString());
     int report_longitude = stoi(ui.report_longitude_line->text().toStdString());
     std::pair<int, int> exact_location = std::make_pair(report_latitude, report_longitude);
-    Report new_report(report_description, this->driver.get_name(), exact_location, 0);
+    std::string driver_name = driver.get_name();
+    Report new_report(report_description, driver_name , exact_location, 0);
     session.add_new_report(new_report);
     ui.report_description_line->clear();
     ui.report_latitude_line->clear();
@@ -75,7 +77,7 @@ void Window::add_report()
 }
 void Window::send_message()
 {
-    std::string new_message = ui.add_message_line->text().toStdString();
+    std::string new_message = driver.get_name() + ": " +  ui.add_message_line->text().toStdString();
     session.add_message(new_message);
     ui.add_message_line->clear();
 

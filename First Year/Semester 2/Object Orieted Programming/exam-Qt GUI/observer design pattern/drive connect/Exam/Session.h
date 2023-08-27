@@ -1,6 +1,7 @@
 #pragma once
 #include "Subject.h"
 #include <vector>
+#include <fstream>
 //e ca la os cand fiecare utilizator se conecteza la un server si incepe o sesiune. asa se conecteaza si fiecare observer.
 //in aceasta sesiune poate sa adauge un report sau un mesaj. astea se adauga la baza de date, adica schimba baza de date, \
 //adica schimba subiectul. deci dam inherit in clasa Session la Subject, si de fiecare data cand adaugam mesaj sau report,
@@ -12,7 +13,9 @@ private:
 	std::vector<Report> reports;
 public:
 	Session(std::vector<Report>& reports1) : reports(reports1) {};
-	~Session() {};
+	~Session() {
+		save_to_file_reports_from_session();
+	};
 	void add_message(std::string& new_message)
 	{
 		messages.push_back(new_message);
@@ -22,6 +25,18 @@ public:
 	{
 		reports.push_back(new_report);
 		notify();
+	}
+	void save_to_file_reports_from_session()
+	{
+		std::ofstream fout("reports.txt");
+		for (Report& report : reports)
+		{
+			fout << report.get_description() + "|" + report.get_reporter() + "|" +
+				std::to_string(report.get_exact_location().first) + "," +
+				std::to_string(report.get_exact_location().second) + "|" + std::to_string(report.get_validation_status())
+				+"\n";
+		}
+
 	}
 	std::vector<Report>& get_reports_from_session() { return this->reports; };
 	std::vector<std::string>& get_messages_from_session() { return this->messages; };
