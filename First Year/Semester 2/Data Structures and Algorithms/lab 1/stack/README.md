@@ -1,1 +1,1 @@
-Abstract Data Type-Stack, represented on a dynamic array
+Implement an Abstract Data Type-Stack, represented on a dynamic array

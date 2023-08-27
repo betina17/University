@@ -1,1 +1,1 @@
-Abstract Data Type-Bag, using a doubly-linked list, with (element, frequency) pairs
+Implement an Abstract Data Type-Bag, using a doubly-linked list, with (element, frequency) pairs
