@@ -1,0 +1,45 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit               ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                  
+    11                                  ; our data is declared here (the variables needed by our program)
+    12                                  segment data use32 class=data
+    13                                      ; ...
+    14 00000000 01020304                        s db 1,2,3,4
+    15                                          len equ $-s
+    16 00000004 0000<rept>                      d times (len-1) dw 0
+    17                                  ; our code starts here
+    18                                  segment code use32 class=code
+    19                                      start:
+    20                                          ; ...
+    21                                          ;TASk: Given a byte string S of length l, obtain the string D of length l-1 as D(i) = S(i) * S(i+1) (each element of D is the product of two consecutive elements of S).
+    22                                  ;Example:
+    23                                  ;S: 1, 2, 3, 4
+    24                                  ;D: 2, 6, 12
+    25 00000000 B903000000                      mov ecx, len-1
+    26 00000005 BE00000000                      mov esi, 0
+    27 0000000A BF00000000                      mov edi, 0
+    28 0000000F E31B                            jecxz end
+    29                                          repeat_loop:
+    30 00000011 8A86[00000000]                      mov al, byte[s+esi] ;al=s(i)
+    31 00000017 8A9E[01000000]                      mov bl, byte[s+esi+1] ;bl=s(i+1)
+    32 0000001D F6E3                                mul bl ;ax=S(i) * S(i+1)
+    33 0000001F 668987[04000000]                    mov [d+edi], ax ;punem primul produs in data
+    34 00000026 46                                  inc esi
+    35 00000027 83C702                              add edi, 2
+    36 0000002A E2E5                                loop repeat_loop
+    37                                              
+    38                                          end:    
+    39                                          
+    40                                          ; exit(0)
+    41 0000002C CD03                            INT 3
+    42 0000002E 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    43 00000030 FF15[00000000]                  call    [exit]       ; call exit to terminate the program
+    44                                          
+    45                                              

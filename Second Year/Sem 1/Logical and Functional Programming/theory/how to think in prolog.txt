@@ -1,0 +1,23 @@
+% Facts
+parent(alice, bob).
+parent(bob, charlie).
+parent(bob, diana).
+
+% Rules
+grandparent(X, Y) :- parent(X, Z), parent(Z, Y).
+sibling(X, Y) :- parent(Z, X), parent(Z, Y), X \= Y.
+
+% Query/Goal
+?- grandparent(alice, Y).
+
+
+Classification
+Facts: These are basic assertions about the world or the domain of discourse. In this program, the parent/2 predicates are facts. They simply state relationships, like parent(alice, bob) which means "Alice is a parent of Bob".
+
+Rules: Rules define more complex relationships or logic using existing facts and potentially other rules. They usually have a head and a body. The body (right side of :-) specifies conditions that must be satisfied for the rule to be true. In our program, we have two rules:
+
+grandparent(X, Y) :- parent(X, Z), parent(Z, Y). This rule defines a grandparent relationship. It states that "X is a grandparent of Y if X is a parent of Z and Z is a parent of Y".
+sibling(X, Y) :- parent(Z, X), parent(Z, Y), X \= Y. This rule defines a sibling relationship. It states that "X and Y are siblings if they share a parent Z, and X is not the same as Y".
+Goals/Conclusions: These are queries or questions we ask based on the facts and rules defined. In Prolog, we often use the term "query" or "goal" for these. In the example, the query is ?- grandparent(alice, Y). This asks "Who are the grandchildren of Alice?" Based on the facts and rules, Prolog will compute and return the answer.
+
+In summary, a Prolog program typically consists of a set of facts (basic truths about the world), rules (logical relations or conditions), and goals (queries asking for information based on the facts and rules). The power of Prolog lies in its ability to logically infer answers to these goals using the given facts and rules.

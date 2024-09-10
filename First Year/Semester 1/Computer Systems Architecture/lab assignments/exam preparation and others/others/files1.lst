@@ -1,0 +1,126 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit               ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                  extern fopen, fclose, fread, fwrite, perror
+    11                                  import fclose msvcrt.dll
+    12                                  import fopen msvcrt.dll
+    13                                  import fread msvcrt.dll
+    14                                  import fwrite msvcrt.dll
+    15                                  import perror msvcrt.dll
+    16                                  ; our data is declared here (the variables needed by our program)
+    17                                  segment data use32 class=data
+    18                                      ; ...
+    19 00000000 FFFFFFFF                    file_descriptor_file_we_read_from dd -1
+    20 00000004 FFFFFFFF                    file_descriptor_file_we_write_to dd -1
+    21 00000008 00000000                    item dd 0
+    22 0000000C 726561645F66696C65-         file_we_read_from db "read_file.txt", 0
+    22 00000015 2E74787400         
+    23 0000001A 7200                        read_mode db "r", 0
+    24 0000001C 77726974655F66696C-         file_we_write_to db "write_file.txt", 0
+    24 00000025 652E74787400       
+    25 0000002B 7700                        write_mode db "w", 0
+    26 0000002D 6572726F7200                error_message db "error", 0
+    27                                      
+    28                                      ;C CODE-pt inc byte cu 1 in loc sa ii faci xor cu 5
+    29                                      ;int main(){
+    30                                      ; FILE *fd_in, *fd_out;
+    31                                      ;char c;
+    32                                      ;int count=0;
+    33                                      ;fd_in = fopen("in.txt", "r");
+    34                                      ;if(fd_in>0) {
+    35                                      ;   fd_out = fopen("out.txt","w");
+    36                                      ;   if(fd_out>0){
+    37                                      ;       do{
+    38                                      ;           count = fread(&c, sizeof(char), 1, fd_in);
+    39                                      ;           c=c+1;
+    40                                      ;           fwrite(&c, sizeof(char), 1, fd_out); adresa de la care citeste-c, si file descriptoru fisierului in care scrie, adica fd_out
+    41                                      ;        }  while(count>0);
+    42                                      ;        fclose(fd_out);
+    43                                      ;   else
+    44                                      ;        perror("Error output file: ");
+    45                                      ;   fclose(fd_in);
+    46                                      ;} else
+    47                                      ;       perror("Error input file:");
+    48                                      ;exit(0);
+    49                                      ;}
+    50                                  ; our code starts here
+    51                                  segment code use32 class=code
+    52                                      start:
+    53                                          ; ...TASK: this program reads the content of a file , xors each chaaracter (byte) with xor, and the writes these transformed bytes in a new file
+    54 00000000 68[1A000000]                    push read_mode
+    55 00000005 68[0C000000]                    push file_we_read_from
+    56 0000000A FF15[00000000]                  call [fopen]
+    57 00000010 83C408                          add esp, 4*2 ;eax=file_descriptor_file_we_read_from
+    58                                          
+    59 00000013 83F800                          cmp eax, 0
+    60 00000016 0F848E000000                    je end_1
+    61                                          ;store the file descriptor in another place because eax is always used for smth else
+    62 0000001C A3[00000000]                    mov [file_descriptor_file_we_read_from], eax 
+    63                                          
+    64                                          ;now we open the file to write in
+    65 00000021 68[2B000000]                    push write_mode
+    66 00000026 68[1C000000]                    push file_we_write_to
+    67 0000002B FF15[00000000]                  call [fopen]
+    68 00000031 83C408                          add esp, 4*2; eax=file_descriptor_file_we_write_to
+    69                                          
+    70 00000034 83F800                          cmp eax, 0
+    71 00000037 7452                            je end_2  ;uita-te pe c code de ce sarim altundeva
+    72 00000039 A3[04000000]                    mov [file_descriptor_file_we_write_to], eax 
+    73                                          
+    74                                          read_loop:
+    75 0000003E FF35[00000000]                      push dword [file_descriptor_file_we_read_from]
+    76 00000044 6A01                                push dword 1 ;size of one char, size of one item you read
+    77 00000046 6A01                                push dword 1 ;we read one byte at a time, so one char (the size of one char is a byte), how many items we read
+    78 00000048 68[08000000]                        push item    ;citim fiecare item din fisier in "item", ca sa ii dam increase (dam increase la fiecare byte)
+    79 0000004D FF15[00000000]                      call [fread]
+    80 00000053 83C410                              add esp, 4*4
+    81                                              
+    82 00000056 83F800                              cmp eax, 0 ;?why, poate cand nu mai are ce sa citeasca
+    83 00000059 7421                                je out_of_loop 
+    84 0000005B 8035[08000000]05                    xor byte [item], 5
+    85                                              
+    86 00000062 FF35[04000000]                      push dword [file_descriptor_file_we_write_to]
+    87 00000068 6A01                                push dword 1
+    88 0000006A 6A01                                push dword 1
+    89 0000006C 68[08000000]                        push item
+    90 00000071 FF15[00000000]                      call [fwrite]
+    91 00000077 83C410                              add esp, 4*4
+    92 0000007A EBC2                                jmp read_loop
+    93                                              
+    94                                           out_of_loop:   
+    95 0000007C FF35[04000000]                      push dword [file_descriptor_file_we_write_to]
+    96 00000082 FF15[00000000]                      call [fclose]
+    97 00000088 83C404                              add esp, 4
+    98                                          end_2:
+    99 0000008B 68[2D000000]                        push dword error_message
+   100 00000090 FF15[00000000]                      call [perror]
+   101 00000096 83C404                              add esp, 4
+   102                                              
+   103 00000099 FF35[00000000]                      push dword [file_descriptor_file_we_read_from]
+   104 0000009F FF15[00000000]                      call [fclose]
+   105 000000A5 83C404                              add esp, 4
+   106                                              
+   107 000000A8 EB0E                                jmp no_error
+   108                                           end_1:
+   109 000000AA 68[2D000000]                        push dword error_message
+   110 000000AF FF15[00000000]                      call [perror]
+   111 000000B5 83C404                              add esp, 4
+   112                                              
+   113                                           no_error:
+   114 000000B8 6A00                                push    dword 0      ; push the parameter for exit onto the stack
+   115 000000BA FF15[00000000]                      call    [exit]       ; call exit to terminate the program
+   116                                  
+   117                                              
+   118                                              
+   119                                              
+   120                                          
+   121                                          
+   122                                      
+   123                                          ; exit(0)
+   124                                         

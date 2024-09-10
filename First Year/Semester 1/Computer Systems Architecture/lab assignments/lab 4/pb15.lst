@@ -1,0 +1,52 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit               ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                  
+    11                                  ; our data is declared here (the variables needed by our program)
+    12                                  segment data use32 class=data
+    13                                      ; ...
+    14 00000000 00000000                    c dd 0
+    15 00000004 294D                        a dw 0100110100101001b
+    16 00000006 8AD3                        b dw 1101001110001010b
+    17                                  
+    18                                      
+    19                                      
+    20                                  ; our code starts here
+    21                                  segment code use32 class=code
+    22                                      start:
+    23                                          ; ...
+    24                                           ;TASK:
+    25                                           ;Given the words A and B, compute the doubleword C as follows:
+    26                                              ;the bits 0-2 of C have the value 0
+    27                                              ;the bits 3-5 of C have the value 1
+    28                                              ;the bits 6-9 of C are the same as the bits 11-14 of A
+    29                                              ;the bits 10-15 of C are the same as the bits 1-6 of B
+    30                                              ;the bits 16-31 of C have the value 1
+    31                                              
+    32 00000000 C705[00000000]0000-                 mov dword [c], 0 
+    32 00000008 0000               
+    33 0000000A B038                                mov al, 00111000b
+    34 0000000C 0805[00000000]                      or byte [c], al ;primii 3 biti se transforma in 0, bitii 3-5 sunt 1
+    35 00000012 66A1[04000000]                      mov ax, [a]
+    36 00000018 66C1E80B                            shr ax, 11 ;bitii 11-14 initiali sunt acum primii biti din ax, adica the lower biti, iar cei 11 biti pe care i-am shiftat sunt 0
+    37 0000001C 66C1E00C                            shl ax, 12 ;bitii 11-14 initiali sunt acum ultimii biti din ax, adica the higher biti, si acum toti bitii lower than these sunt 0
+    38 00000020 66C1E806                            shr ax, 6 ;pun bitii acestia, 11-14 initiali, pe pozitia 6-9
+    39 00000024 660905[00000000]                    or word [c], ax ;the bits 6-9 of C are the same as the bits 11-14 of A
+    40 0000002B 66A1[06000000]                      mov ax, [b]
+    41 00000031 66D1E8                              shr ax, 1 ;bitii 1-6 initiali sunt pe 0-5
+    42 00000034 66C1E00A                            shl ax, 10; bitii 1-6 initali sunt acum the left most bits, the highest bits, pe pozitiile 10-15 pe care trebe sa ajunga si in c, si toti bitii
+    43                                                        ;dinaintea lor sunt 0, cum au fost shiftati. fac shl 10 pt ca tre sa mut cei 6 biti din most right to most left, adica 16-6=10
+    44 00000038 660905[00000000]                    or word[c], ax;the bits 10-15 of C are the same as the bits 1-6 of B
+    45 0000003F 66C705[02000000]FF-                 mov word[c+2], 0FFFFh
+    45 00000047 FF                 
+    46                                              
+    47                                              
+    48                                          ; exit(0)
+    49 00000048 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    50 0000004A FF15[00000000]                  call    [exit]       ; call exit to terminate the program

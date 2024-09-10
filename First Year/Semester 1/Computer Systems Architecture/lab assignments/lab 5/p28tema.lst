@@ -1,0 +1,38 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit               ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                  
+    11                                  ; our data is declared here (the variables needed by our program)
+    12                                  segment data use32 class=data
+    13                                      ; ...
+    14 00000000 010203040506                s db 1,2,3,4,5,6
+    15                                      len equ $-s
+    16 00000006 00<rept>                    d times (len-1) db 0
+    17                                  ; our code starts here
+    18                                  segment code use32 class=code
+    19                                      start:
+    20                                          ; ...TASK:A byte string S is given. Build the string D whose elements represent the sum of each two consecutive bytes of S.
+    21                                  ;Example:
+    22                                  ;S: 1, 2, 3, 4, 5, 6
+    23                                  ;D: 3, 5, 7, 9, 11
+    24 00000000 B905000000                      mov ecx, len-1
+    25 00000005 BE00000000                      mov esi, 0
+    26 0000000A E317                            jecxz end
+    27                                          repeat_loop:
+    28 0000000C 8A86[00000000]                      mov al, [s+esi]
+    29 00000012 8A9E[01000000]                      mov bl, [s+esi+1]
+    30 00000018 00D8                                add al, bl 
+    31 0000001A 8886[06000000]                      mov [d+esi], al
+    32 00000020 46                                  inc esi
+    33 00000021 E2E9                                loop repeat_loop
+    34                                          end:
+    35 00000023 CD03                            INT 3
+    36                                          ; exit(0)
+    37 00000025 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    38 00000027 FF15[00000000]                  call    [exit]       ; call exit to terminate the program

@@ -1,0 +1,51 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit               ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                  
+    11                                  ; our data is declared here (the variables needed by our program)
+    12                                  segment data use32 class=data
+    13                                      ; ...
+    14                                      
+    15 00000000 010203040506                input db 1,2,3,4,5,6
+    16                                      N equ ($-input)
+    17 00000006 020204040606                src db 2,2,4,4,6,6
+    18 0000000C 010103030505                dst db 1,1,3,3,5,5
+    19 00000012 00<rept>                    output times N db 0
+    20                                  
+    21                                  ; our code starts here
+    22                                  segment code use32 class=code
+    23                                      start:
+    24                                          ; ...
+    25                                          ;TASK
+    26                                          ;A string of bytes 'input' is given together with two additional strings of N bytes each, 'src' and 'dst'. Obtain a new string of bytes called 'output' from ;the 'input' string, by replacing all the bytes wi
+    27 00000000 BE[00000000]                    mov esi, input
+    28 00000005 BF[06000000]                    mov edi, src
+    29 0000000A B906000000                      mov ecx, N
+    30 0000000F E322                            jecxz done
+    31 00000011 BB00000000                      mov ebx, 0
+    32                                          if:
+    33 00000016 A6                                  cmpsb 
+    34 00000017 740B                                je replace ;daca sunt egale sare la replace
+    35 00000019 8A56FF                              mov dl, byte [esi-1]
+    36 0000001C 8893[12000000]                      mov [output+ebx], dl      ;daca nu sunt, muta elem din input in output, esi-1 pt ca a incrementat deja 
+    37 00000022 EB0C                                jmp endif 
+    38                                              replace:
+    39 00000024 8A93[0C000000]                          mov dl, byte [dst +ebx]
+    40 0000002A 8893[12000000]                          mov [output+ebx],  dl ;pune in output byte-ul din dst
+    41                                              
+    42                                              endif:
+    43 00000030 43                                      inc ebx
+    44 00000031 E2E3                                loop if
+    45                                              
+    46                                          
+    47                                          
+    48                                          done:
+    49                                          ; exit(0)
+    50 00000033 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    51 00000035 FF15[00000000]                  call    [exit]       ; call exit to terminate the program

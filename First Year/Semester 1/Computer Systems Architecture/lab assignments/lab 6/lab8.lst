@@ -1,0 +1,52 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit, printf, scanf               ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                  import printf msvcrt.dll     ; indicating to the assembler that the printf fct can be found in the msvcrt.dll library
+    11                                  import scanf msvcrt.dll
+    12                                  
+    13                                  ; our data is declared here (the variables needed by our program)
+    14                                  segment data use32 class=data
+    15                                      ; ...
+    16 00000000 00000000                    a dd 0
+    17 00000004 00000000                    b dd 0 ;NEAPARAT TREBUIE SA DEFINIM DD, PENTRU CA CU %D EL ASTEAPTA SA CITIM UN INT, CARE E PE 4 BYTES, ADICA DD, NU POTI SPUNE BYTE SAU WORD
+    18 00000008 612A623D256400              message1 db "a*b=%d", 0
+    19 0000000F 696E74726F64756365-         message2 db "introduce the two numbers, separated by comma>", 0
+    19 00000018 207468652074776F20-
+    19 00000021 6E756D626572732C20-
+    19 0000002A 736570617261746564-
+    19 00000033 20627920636F6D6D61-
+    19 0000003C 3E00               
+    20 0000003E 256420256400                format db "%d %d", 0
+    21                                  ; our code starts here
+    22                                  segment code use32 class=code
+    23                                      start:
+    24                                          ; ...TASK: READ 2 NUMBERS FROM THE KEYBOARD, MULTIPLY THEM AND PRINT THEM
+    25 00000000 68[0F000000]                    push dword message2
+    26 00000005 FF15[00000000]                  call [printf]
+    27 0000000B 83C404                          add esp, 4
+    28                                          
+    29 0000000E 68[00000000]                    push dword a
+    30 00000013 68[04000000]                    push dword b
+    31 00000018 68[3E000000]                    push dword format
+    32 0000001D FF15[00000000]                  call [scanf]
+    33 00000023 83C40C                          add esp, 4*3
+    34                                          
+    35 00000026 B800000000                      mov eax, 0
+    36 0000002B A0[00000000]                    mov al, [a]
+    37 00000030 8A1D[04000000]                  mov bl, [b]
+    38 00000036 F6E3                            mul bl
+    39                                          
+    40 00000038 50                              push dword eax
+    41 00000039 68[08000000]                    push dword message1
+    42 0000003E FF15[00000000]                  call [printf]
+    43 00000044 83C408                          add esp, 4*2
+    44                                          ; exit(0)
+    45 00000047 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    46 00000049 FF15[00000000]                  call    [exit]       ; call exit to terminate the program
+    47                                          

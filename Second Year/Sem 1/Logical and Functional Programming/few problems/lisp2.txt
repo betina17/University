@@ -1,0 +1,27 @@
+(A (B) (C (D) (E)))
+13. For a given tree of type (2) return the path from the root node to a certain given node X.
+(defun calea (l e)    
+    (cond
+        ((null l) nil)
+        ((equal (car l) e) (list e)) ;if the first elem is the target, it returns it as list
+        (t 
+         ((lambda (l e x y) ;x and y will be the children of the current node from the list
+                 (cond 
+                     ((and (null x) (null y)) nil)  ;if the target was found in none of the children
+                     (t (cons (car l) (append x y))) 
+                 ))
+                 l e (calea (cadr l) e) (calea (caddr l) e))
+
+        )
+    )
+)
+
+(print (calea '(A (B) (C (D) (E))) 'D))
+
+; (t (cons (car l) (append x y))) -this will append the results found in the children-
+;so if the target wa found in child x, then y will be nil
+;and then will put at the left of this list the current element, constructing the 
+;path from the root to the target
+
+;the recursive calls are made to the second ((cadr l)) and third ((caddr l)) elements 
+;of the list, which represent the first and second child of the current node

@@ -1,0 +1,17 @@
+; 12. Write a function that substitutes an element through another one at all levels of a given list
+
+(defun _replace (l e r)
+    (cond
+        ((and (numberp l) (if (= l e) r l))) ;using and, we only evaluate the "if" if l is a number
+        ((listp l) (mapcar #'(lambda (a) (_replace a e r)) l))
+    )
+)
+
+(print (_replace '(1 2 (1 2 (3 1) 2)) 1 0))
+
+;(if (= l e) r l)))-if l is a  number and it is eqaul to the elem we want to replace,
+;we return r, the replacement, if not, we return l itself
+;((listp l) (mapcar #'(lambda (a) (_replace a e r)) l))
+;This means for each element a of the list l, _replace a e r is called. If a is a nested
+;list, _replace processes it recursively.
+;mapcar applies the function lambda ona ll the elements of the list l

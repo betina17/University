@@ -1,0 +1,29 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit               ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                  
+    11                                  ; our data is declared here (the variables needed by our program)
+    12                                  segment data use32 class=data
+    13                                      ; ...
+    14                                      
+    15                                  
+    16                                  ; our code starts here
+    17                                  segment code use32 class=code
+    18                                      start:
+    19                                          ; ...
+    20 00000000 B803000000                      mov eax, 3
+    21 00000005 BB04000000                      mov ebx, 4
+    22 0000000A 50                              push eax
+    23 0000000B 53                              push ebx
+    24 0000000C 58                              pop eax
+    25 0000000D 894424FC                        mov [esp-4], eax
+    26                                      
+    27                                          ; exit(0)
+    28 00000011 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    29 00000013 FF15[00000000]                  call    [exit]       ; call exit to terminate the program

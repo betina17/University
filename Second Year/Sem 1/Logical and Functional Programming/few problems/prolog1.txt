@@ -1,0 +1,64 @@
+%mathematical model:
+%f(l, s)={
+%			[], l=[] and s=[]
+%			l, s=[]
+%			s, l=[]
+%			l1 U f(l2...ln, s1...sn), l1<s1
+%			l2 U f(l1...ln, s2...sn), l1>s1
+%			l1 U f(l2...ln, s2...sn), l1=l2
+
+
+% merge_sorted_lists(List1, List2, Merged)
+% Merges two sorted lists (List1 and List2) into a single sorted list (Merged) without duplicates.
+
+merge_sorted_lists([], List, List) :- !.
+merge_sorted_lists(List, [], List) :- !.
+merge_sorted_lists([H1|T1], [H2|T2], [H1|Merged]) :-
+    H1 < H2, !, merge_sorted_lists(T1, [H2|T2], Merged).
+merge_sorted_lists([H1|T1], [H2|T2], [H2|Merged]) :-
+    H1 > H2, !, merge_sorted_lists([H1|T1], T2, Merged).
+merge_sorted_lists([H|T1], [_|T2], [H|Merged]) :-
+    merge_sorted_lists(T1, T2, Merged).
+
+?-merge_sorted_lists([1,2,3,4,5,6], [1,2,3,7,8], List)
+
+
+
+
+
+LAB 2 PB 7 PCT B PROLOG
+% Predicate to create a list from M to N
+range(M, N, []) :- M > N.  % Base case: if M is greater than N, return an empty list
+range(M, N, [M|T]) :-     % Recursive case
+    M =< N,               % Check if M is less than or equal to N
+    M1 is M + 1,          % Increment M
+    range(M1, N, T).      % Recursive call with incremented M
+
+
+LAB 3 PB 7 PCT B
+
+% Predicate to append only sublists from the main list to a new list
+extract_sublists([], []).
+extract_sublists([H|T], [H|Sublist]) :-
+    is_list(H),                    % Check if the head is a list
+    extract_sublists(T, Sublist).  % Process the rest of the list
+extract_sublists([H|T], Sublist) :-
+    \+ is_list(H),                 % Check if the head is not a list
+    extract_sublists(T, Sublist).  % Process the rest of the list
+
+
+% Predicate to remove duplicates from a list
+remove_duplicates([], []).
+remove_duplicates([H|T], [H|T1]) :-
+    \+ member(H, T),               % Check if H is not a member of T
+    remove_duplicates(T, T1).      % Process the rest of the list
+remove_duplicates([H|T], T1) :-
+    member(H, T),                  % Check if H is a member of T
+    remove_duplicates(T, T1).      % Process the rest of the list
+
+
+?- extract_sublists([1, [2, 3], 4, 5, [1, 4, 6], 3, [1, 3, 7, 9, 10], 5, [1, 1, 11], 8], Sublists),
+   flatten(Sublists, Flattened),
+   remove_duplicates(Flattened, Result).
+Sublists = [[2, 3], [1, 4, 6], [1, 3, 7, 9, 10], [1, 1, 11]],
+Flattened = [2, 3, 1, 4, 6, 1,

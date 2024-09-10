@@ -14,9 +14,10 @@
 def create_complex_number(real_part_complex_number, imaginary_part_complex_number):
     return [real_part_complex_number, imaginary_part_complex_number]
 
-def generate_list_10_random_complex_numbers():
+def generate_list_12_random_complex_numbers():
     list_real_part_complex_number=[5,5,5,4,3,3,5,6,6,6,2,2,2]
     list_imaginary_part_complex_number=[7,7,7,8,9,9,7,3,3,3,1,1,1]
+
     list_complex_numbers=[]
     for i in range(0,13):
         complex_number=create_complex_number(list_real_part_complex_number[i], list_imaginary_part_complex_number[i])
@@ -25,14 +26,6 @@ def generate_list_10_random_complex_numbers():
 
 def add_elements_to_list_complex_numbers(list_complex_numbers:list, complex_number_from_user):
     list_complex_numbers.append(complex_number_from_user)
-
-
-# Write below this comment
-# Functions to deal with complex numbers -- dict representation
-# -> There should be no print or input statements in this section
-# -> Each function should do one thing only
-# -> Functions communicate using input parameters and their return values
-#
 
 #
 # Write below this comment
@@ -49,7 +42,7 @@ def find_longest_subarray_with_maximum_3_distinct_values(list_complex_numbers:li
     position_in_list_frequencies = 0
     second_distinct_element_of_subarray=True
     i=0
-    #for i in range(0,len(list_complex_numbers)):
+
     while i < len(list_complex_numbers):
         we_go_to_another_subarray = False
         if i == position_first_element_in_subarray:
@@ -109,28 +102,32 @@ def display_longest_subarray_with_maximum_3_distinct_values(list_complex_numbers
     for i in range(start_point_of_longest_subarray, end_point_longest_subarray+1):
         display_each_element_from_logest_subarray(list_complex_numbers[i])
 def main():
-    list_complex_numbers = generate_list_10_random_complex_numbers()
-    print("Press 1 to add a complex number to the list of complex numbers")
-    print("Press 2 to display all the elements of the list")
-    print("Press 3 to display the length and elements of a longest subarray of numbers that contain at most 3 distinct values.")
-    print("Press 4 to exit the program")
+    list_complex_numbers = generate_list_12_random_complex_numbers()
+    add_number = 1
+    display_numbers = 2
+    display_length_and_elements_longest_subarray = 3
+    exit_program = 4
+    print(f"Press {add_number} to add a complex number to the list of complex numbers")
+    print(f"Press {display_numbers} to display all the elements of the list")
+    print(f"Press {display_length_and_elements_longest_subarray} to display the length and elements of a longest subarray of numbers that contain at most 3 distinct values.")
+    print(f"Press {display_length_and_elements_longest_subarray} to exit the program")
 
     while True:
         key = input(">")
-        if key == "1":
+        if key == add_number:
             real_part_complex_number=input("Introduce the real part of the complex number: ")
             imaginary_part_complex_number=input("Introduce the imaginary part of the complex number: ")
             complex_number_from_user=create_complex_number(real_part_complex_number, imaginary_part_complex_number)
             add_elements_to_list_complex_numbers(list_complex_numbers, complex_number_from_user)
-        elif key == "2":
+        elif key == display_numbers:
             print(display_list_complex_numbers(list_complex_numbers))
-        elif key == "3":
+        elif key == display_length_and_elements_longest_subarray:
             subsequence_interval=find_longest_subarray_with_maximum_3_distinct_values(list_complex_numbers)
-            print("The length of a longest subarray of numbers that contain at most 3 distinct: ")
+            print("The length of a longest subarray of numbers that contain at most 3 distinct values: ")
             print(display_length_longest_subarray_with_maximum_3_distinct_values(subsequence_interval[0], subsequence_interval[1]))
             print("And its elements are: ")
             print(display_longest_subarray_with_maximum_3_distinct_values(list_complex_numbers, subsequence_interval[0], subsequence_interval[1]))
-        elif key == "4":
+        elif key == exit_program:
             break
         else:
             print("You didn't press a valid key. Try again.")

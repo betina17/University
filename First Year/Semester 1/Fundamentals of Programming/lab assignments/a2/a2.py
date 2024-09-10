@@ -24,7 +24,6 @@ def CocktailSortListOfRandomNaturalNumbers(ListOfRandomNaturalNumbers, step):
                     print(f'The partially sorted list after a number of {NumberOfSwapsMade} swaps: ')
                     print (ListOfRandomNaturalNumbers)
                 SwapOfTwoNumbersFromTheList=True
-
         for j in range(UpperPartOfTheList-1, LowerPartOfTheList, -1):
             if ListOfRandomNaturalNumbers[j]<ListOfRandomNaturalNumbers[j-1]:
                 ListOfRandomNaturalNumbers[j], ListOfRandomNaturalNumbers[j-1] = ListOfRandomNaturalNumbers[j-1], ListOfRandomNaturalNumbers[j]

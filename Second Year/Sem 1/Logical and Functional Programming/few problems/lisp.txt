@@ -1,0 +1,37 @@
+(defun aduna-liste (lista1 lista2 &optional carry)
+  ;aduna doua liste care reprezinta numere, cifra cu cifra
+  (if (and (null lista1) (null lista2) )
+      nil ; daca ambele liste sunt goale si nu exista transport, returneaza lista goala
+      (let ((suma (+ (car (rev lista1)) (car (rev lista2)) (if carry 1 0))))
+        (cons (mod suma 10) ; adauga cifra unitatilor la rezultat
+              (aduna-liste (cdr (rev lista1)) (cdr (rev lista2)) (> suma 9)))))) ; recursivitate cu restul listei si transportul
+
+(defun rev (l)
+    (cond
+        ((null l) '())
+        (T (append (rev (cdr l)) (list (car l)))))) 
+        
+(print(aduna-liste '(5 6 7) '(3 3 3)))
+
+
+
+;aduna-liste(l, s, c, rez) = { [], l=[] or s=[] 
+;                           (l1+s1+c)%10 U aduna-liste(l2...ln, s2...sn, 1), l1+s1+c>9
+;                           (l1+s1+c)%10 U aduna-liste(l2...ln, s2...sn, 0), l1+s1+c<=9
+;                           (l1+s1+c)/10
+
+
+
+(defun aduna-liste (lista1 lista2 )
+  (if (and (null lista1) (null lista2) )
+      0 ; daca ambele liste sunt goale, returneaza lista goala
+      (let ((suma (+ (car lista1) (car lista2))))
+        (cons suma  ; adauga suma la rezultat, in fata
+              (aduna-liste (cdr lista1) (cdr lista2) ))))) ; recursivitate cu restul listei 
+(print(aduna-liste '() '(1)))
+
+;aduna-liste(l, s, rez) = { [], l=[] or s=[]
+;                           l1+s1 U aduna-liste(l2...ln, s2...sn)
+                          
+
+

@@ -1,0 +1,87 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                  extern exit, printf, scanf               ; tell nasm that exit exists even if we won't be defining it
+     8                                  import exit msvcrt.dll    ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                        ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions'
+    10                                  import printf msvcrt.dll
+    11                                  import scanf msvcrt.dll
+    12                                  
+    13                                  ; our data is declared here (the variables needed by our program)
+    14                                  segment data use32 class=data
+    15                                      ; ...
+    16 00000000 00000000                    a dd 0
+    17 00000004 00000000                    b dd 0
+    18 00000008 696E74726F64756365-         message1 db "introduce the two numbers in base 10, separated by comma>", 0
+    18 00000011 207468652074776F20-
+    18 0000001A 6E756D626572732069-
+    18 00000023 6E2062617365203130-
+    18 0000002C 2C2073657061726174-
+    18 00000035 656420627920636F6D-
+    18 0000003E 6D613E00           
+    19 00000042 25642C256400                format db "%d,%d", 0
+    20 00000048 3C25643E203C203C25-         format_less db "<%d> < <%d>", 0
+    20 00000051 643E00             
+    21 00000054 3C25643E203D203C25-         format_equal db "<%d> = <%d>", 0
+    21 0000005D 643E00             
+    22 00000060 3C25643E203E203C25-         format_higher db "<%d> > <%d>", 0
+    22 00000069 643E00             
+    23                                      
+    24                                  ; our code starts here
+    25                                  segment code use32 class=code
+    26                                      start:
+    27                                          ; ...TASK: Read two numbers a and b (in base 10) from the keyboard and determine the order relation between them (either a < b, or a = b, or a > b). Display the result in the following format: "<a> < <b>, <a
+    28                                          
+    29 00000000 68[08000000]                    push dword message1
+    30 00000005 FF15[00000000]                  call [printf]
+    31 0000000B 83C404                          add esp, 4
+    32                                          
+    33 0000000E 68[04000000]                    push dword b
+    34 00000013 68[00000000]                    push dword a
+    35 00000018 68[42000000]                    push dword format
+    36 0000001D FF15[00000000]                  call [scanf]
+    37 00000023 83C40C                          add esp, 4*3
+    38                                          
+    39 00000026 B800000000                      mov eax, 0
+    40 0000002B BB00000000                      mov ebx, 0
+    41 00000030 A0[00000000]                    mov al, [a]
+    42 00000035 8A1D[04000000]                  mov bl, [b]
+    43 0000003B 38D8                            cmp al, bl
+    44 0000003D 7C04                            jl a_is_lower
+    45 0000003F 741E                            je equal
+    46 00000041 7F38                            jg a_is_higher
+    47                                       
+    48                                          a_is_lower:
+    49 00000043 FF35[04000000]                       push dword [b]
+    50 00000049 FF35[00000000]                       push dword [a]
+    51 0000004F 68[48000000]                         push dword format_less
+    52 00000054 FF15[00000000]                       call [printf]
+    53 0000005A 83C40C                               add esp, 4*3
+    54 0000005D EB36                                 jmp end
+    55                                               
+    56                                          equal:
+    57 0000005F FF35[04000000]                       push dword [b]
+    58 00000065 FF35[00000000]                       push dword [a]
+    59 0000006B 68[54000000]                         push dword format_equal
+    60 00000070 FF15[00000000]                       call [printf]
+    61 00000076 83C40C                               add esp, 4*3
+    62 00000079 EB1A                                 jmp end
+    63                                               
+    64                                         a_is_higher:
+    65 0000007B FF35[04000000]                       push dword [b]
+    66 00000081 FF35[00000000]                       push dword [a]
+    67 00000087 68[60000000]                         push dword format_higher
+    68 0000008C FF15[00000000]                       call [printf]
+    69 00000092 83C40C                               add esp, 4*3
+    70                                               
+    71                                               
+    72                                               
+    73                                               
+    74                                          
+    75                                          end:
+    76                                          ; exit(0)
+    77 00000095 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+    78 00000097 FF15[00000000]                  call    [exit]       ; call exit to terminate the program

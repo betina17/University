@@ -1,0 +1,129 @@
+     1                                  bits 32 ; assembling for the 32 bits architecture
+     2                                  
+     3                                  ; declare the EntryPoint (a label defining the very first instruction of the program)
+     4                                  global start        
+     5                                  
+     6                                  ; declare external functions needed by our program
+     7                                               ; tell nasm that exit exists even if we won't be defining it
+     8                                      ; exit is a function that ends the calling process. It is defined in msvcrt.dll
+     9                                                            ; msvcrt.dll contains exit, printf and all the other important C-runtime specific functions
+    10                                                            extern exit, scanf, printf, fopen, fread, fclose, fprintf               ; tell nasm that exit exists even if we won't be defining it
+    11                                  import exit msvcrt.dll
+    12                                  import scanf msvcrt.dll
+    13                                  import printf msvcrt.dll
+    14                                  import fopen msvcrt.dll
+    15                                  import fclose msvcrt.dll
+    16                                  import fread msvcrt.dll
+    17                                  import fprintf msvcrt.dll 
+    18                                  
+    19                                  ; our data is declared here (the variables needed by our program)
+    20                                  segment data use32 class=data
+    21                                      ; ...
+    22 00000000 7200                        textPermissionRead db "r", 0
+    23 00000002 7700                        textPermissionWrite db "w", 0
+    24 00000004 FFFFFFFF                    fileDescriptor dd -1 ;deci eu la adresa spre care arata file descriptoru pun -1, sau pot pune orice variabila ca ii da overwrite cu adresa fisierului, de asta
+    25                                      ;rezerv pt fileDescriptor un double, ca o sa pun acolo valoarea unei adrese, care a double
+    26 00000008 <res 00000064>              text_to_write_in resb 100
+    27 0000006C 696E7075742E747874-         inputFileName db "input.txt", 0
+    27 00000075 00                 
+    28 00000076 6F75747075742E7478-         outputFileName db "output.txt", 0
+    28 0000007F 7400               
+    29 00000081 00                          nrOfWords db 0
+    30 00000082 00                          counter db 0
+    31 00000083 256400                      format_int db "%d",0
+    32                                     
+    33                                    
+    34                                  ; our code starts here
+    35                                  segment code use32 class=code
+    36                                      start:
+    37 00000000 CD03                        int 3
+    38                                          ; ...
+    39                                          ;TASK: avem un text cu spatii in fisierul input.txt si trebuie sa afisam in fisierul output.txt:
+    40                                          ;-pe prima linie: textul cu spatiile inlocuite cu litera x
+    41                                          ;-pe a doua linie: nr de cuvinte
+    42 00000002 68[00000000]                    push dword textPermissionRead
+    43 00000007 68[6C000000]                    push dword inputFileName
+    44 0000000C FF15[00000000]                  call [fopen]
+    45 00000012 83C408                          add esp, 4*2 ;chestia asta pune adresa de la fileName in eax
+    46                                  
+    47 00000015 A3[04000000]                    mov [fileDescriptor], eax ;mutam adresa lui fileName, care e stocata in eax,  in continutul de memorie de la adresa lui fileDescriptor
+    48 0000001A 83F800                          cmp eax, 0 ;daca eax e 0, inseamna ca nu s-a creat/deschis bine fisierul de catre fopen
+    49                                         
+    50                                  
+    51 0000001D FF35[04000000]                  push dword [fileDescriptor] ;punem continutul de la adresa spre care arata fileDescriptor pe stack, continutul fiind adresa lui fileName
+    52 00000023 6A64                            push dword 100 ;TEH SIZE OF THE BYTE STRING (dimensiunea lui text, adica 100 ca i am zis resb 100)-unde punem textul pe care il citim din file
+    53 00000025 6A01                            push dword 1 ;DIMENSION OF ONE BYTE
+    54 00000027 68[08000000]                    push dword text_to_write_in ;citim aici din fisier, THE BYTE STRING (text resB)
+    55 0000002C FF15[00000000]                  call [fread]
+    56 00000032 83C410                          add esp, 4 * 4
+    57                                          ;de ce am pus in ordinea asta, si de ce 100 si 1:
+    58                                          ;When reading from a text file, the first argument of the fread function is the address of the byte string(text_to_write_int) where we will write in and the second argument is 1 (= dimension of one byte). Th
+    59                                          ;codul
+    60                                          ;c code fread(&file_we_write_to, sizeof(char), 100, descriptor_of_file_we_read_from)
+    61                                  
+    62                                        
+    63                                          
+    64 00000035 89C1                            mov ecx, eax ;in eax se salveaza nr de caractere din fisier, de aia il mutam in ecx ca sa parcurgem fiecare caracter si sa inlocuim spatiile cu x
+    65                                       
+    66 00000037 BE[08000000]                    mov esi, text_to_write_in ;mutam in esi string-ul nostru
+    67 0000003C B320                            mov bl, ' '
+    68                                          textParsing:
+    69 0000003E 8A06                                mov al, byte[esi]
+    70 00000040 3C20                                cmp al, ' '
+    71 00000042 7402                                je isSpace
+    72 00000044 EB10                                jmp notSpace
+    73                                              isSpace:
+    74 00000046 C60678                                  mov byte [esi], 'x' ;punem x in loc de spatiu
+    75 00000049 80FB20                                  cmp bl, ' ' ;daca caracterul de dinainte e tot spatiu, nu avem un nou cuv, daca nu e spatiu, si e o litera, avem-totusi poate sa fie si alt caracter special
+    76                                                  
+    77 0000004C 7402                                    je oneMoreWord
+    78 0000004E EB06                                     jmp notSpace
+    79                                                  oneMoreWord:
+    80 00000050 FE05[81000000]                              inc byte [nrOfWords] ;daca am gasit un spatiu, inseamna ca avem un cuv
+    81                                              notSpace:
+    82 00000056 8A1E                                mov bl, byte [esi] ;salvam ultimul caracter prin care am trecut    
+    83 00000058 FE05[82000000]                      inc byte [counter]
+    84 0000005E 46                                  inc esi
+    85 0000005F E2DD                                loop textParsing
+    86                                               
+    87 00000061 80FB20                          cmp bl, ' '
+    88 00000064 7502                            jne oneMoreWord2
+    89 00000066 EB06                            jmp outside
+    90                                          oneMoreWord2:
+    91 00000068 FE05[81000000]                      inc byte [nrOfWords] ;daca am gasit un spatiu, inseamna ca avem un cuv
+    92                                         
+    93                                          outside:
+    94                                          
+    95 0000006E CD03                            int 3
+    96                                           
+    97 00000070 FF35[04000000]                  push dword [fileDescriptor] ;aici avema adresa fisierului, asa il accesam, cu fileDescriptor
+    98 00000076 FF15[00000000]                  call [fclose]
+    99 0000007C 83C404                          add esp, 4 ;inchidem fisierul
+   100                                          
+   101 0000007F 89C3                            mov ebx, eax ;ca sa punem in eax adresa de la fisieru pe care urmeaza sa il deschidem
+   102 00000081 68[02000000]                    push dword textPermissionWrite
+   103 00000086 68[76000000]                    push dword outputFileName
+   104 0000008B FF15[00000000]                  call [fopen]
+   105 00000091 83C408                          add esp, 4*2
+   106                                         
+   107                                  
+   108 00000094 A3[04000000]                    mov [fileDescriptor], eax
+   109                                  
+   110 00000099 68[08000000]                    push dword text_to_write_in
+   111 0000009E FF35[04000000]                  push dword [fileDescriptor]
+   112 000000A4 FF15[00000000]                  call [fprintf] ;fprintf(file_descriptor, text_to_write_from)
+   113 000000AA 83C408                          add esp, 4 * 2
+   114                                  
+   115                                         
+   116 000000AD FF35[81000000]                  push dword [nrOfWords]
+   117 000000B3 68[83000000]                    push dword format_int
+   118 000000B8 FF35[04000000]                  push dword [fileDescriptor]
+   119 000000BE FF15[00000000]                  call [fprintf] ;fprintf(file_descriptor, text_to_write_from)
+   120 000000C4 83C408                          add esp, 4 * 2
+   121                                  
+   122                                  
+   123                                  
+   124                                  
+   125                                          ; exit(0)
+   126 000000C7 6A00                            push    dword 0      ; push the parameter for exit onto the stack
+   127 000000C9 FF15[00000000]                  call    [exit]       ; call exit to terminate the program
